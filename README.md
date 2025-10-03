@@ -1,12 +1,6 @@
 # I.G-UNIVERSAL-1.0-
 🕵️ Universal OSINT Tool - Advanced Open Source Intelligence for Instagram &amp; Roblox | Kali Linux | Educational Purpose Only | Python Security Research | Public Data Analysis
-
-  _____   ___             __ _____         __  __  __    _      __  
-  \_   \ / _ \  /\ /\  /\ \ \\_   \/\   /\/__\/__\/ _\  /_\    / /  
-   / /\// /_\/ / / \ \/  \/ / / /\/\ \ / /_\ / \//\ \  //_\\  / /   
-/\/ /__/ /_\\  \ \_/ / /\  /\/ /_   \ V //__/ _  \_\ \/  _  \/ /___ 
-\____(_)____/   \___/\_\ \/\____/    \_/\__/\/ \_/\__/\_/ \_/\____/ 
-                                                                    
+                                                                  
 I.R Universal — Universal OSINT Tool
 
 <div align="center">
