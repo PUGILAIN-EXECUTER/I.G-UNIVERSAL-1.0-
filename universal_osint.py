@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 """
-UNIVERSAL REAL OSINT TOOL - Educational Purpose Only
-METODI REALI per Instagram e Roblox
+UNIVERSAL OSINT TOOL - REAL WORKING VERSION
+Combines Instagram OSINT + Real Roblox API + Universal Search
+EDUCATIONAL PURPOSE ONLY
 """
 
-import os
-import sys
-import time
 import requests
 import json
+import time
 import re
-import base64
+import sys
 from datetime import datetime
-import concurrent.futures
 
 class Colors:
     RED = '\033[91m'
@@ -25,13 +23,14 @@ class Colors:
     BOLD = '\033[1m'
     END = '\033[0m'
 
-class RealOSINT:
+class UniversalOSINT:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
+            'Accept': 'application/json'
         })
-        
+    
     def banner(self):
         print(f"""{Colors.RED}{Colors.BOLD}
     
@@ -41,486 +40,366 @@ class RealOSINT:
  _/ /_/ /_/ /  / /_/ / /|  // /  | |/ / /___/ _, _/___/ / ___ |/ /___
 /___(_)____/   \____/_/ |_/___/  |___/_____/_/ |_|/____/_/  |_/_____/
                                                                      
-                                                                        
-    {Colors.CYAN}REAL OSINT TOOL - METODI REALI DI RACCOLTA DATI{Colors.END}
-    {Colors.YELLOW}Instagram & Roblox - PUBLIC API & WEB SCRAPING{Colors.END}
+                                   
+    {Colors.CYAN}UNIVERSAL OSINT TOOL - REAL WORKING VERSION{Colors.END}
+    {Colors.YELLOW}Instagram + Roblox Real API + Universal Search{Colors.END}
     {Colors.RED}⚠️  FOR EDUCATIONAL PURPOSES ONLY ⚠️{Colors.END}
     
 {Colors.END}""")
 
-    # ==================== ROBLOX REAL METHODS ====================
-
-    def roblox_get_user_info(self, username):
-        """Ottiene informazioni REALI da Roblox API"""
-        print(f"\n{Colors.CYAN}[🎮] Ricerca informazioni REALI Roblox per: {username}{Colors.END}")
-        
+    # ==================== REAL ROBLOX OSINT ====================
+    
+    def get_roblox_user_id(self, username):
+        """Get Roblox user ID from username"""
         try:
-            # API Ufficiale Roblox
-            user_url = f"https://users.roblox.com/v1/users/search?keyword={username}"
-            response = self.session.get(user_url, timeout=10)
+            url = f"https://api.roblox.com/users/get-by-username?username={username}"
+            response = self.session.get(url)
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get('data'):
-                    user_id = data['data'][0]['id']
-                    return self._get_detailed_roblox_info(user_id, username)
-            
-            return self._fallback_roblox_search(username)
-            
+                if 'Id' in data:
+                    return data['Id']
+            return None
         except Exception as e:
-            print(f"{Colors.RED}Errore API Roblox: {e}{Colors.END}")
-            return self._fallback_roblox_search(username)
+            print(f"{Colors.RED}Error getting user ID: {e}{Colors.END}")
+            return None
 
-    def _get_detailed_roblox_info(self, user_id, username):
-        """Ottiene informazioni dettagliate usando l'ID utente"""
+    def get_roblox_user_info(self, user_id):
+        """Get complete Roblox user information"""
         try:
-            # Informazioni base utente
-            profile_url = f"https://users.roblox.com/v1/users/{user_id}"
-            profile_response = self.session.get(profile_url)
-            profile_data = profile_response.json() if profile_response.status_code == 200 else {}
+            url = f"https://users.roblox.com/v1/users/{user_id}"
+            response = self.session.get(url)
             
-            # Presenza online
-            presence_url = f"https://presence.roblox.com/v1/presence/users"
-            presence_data = self._get_roblox_presence([user_id])
-            
-            # Amici
-            friends_url = f"https://friends.roblox.com/v1/users/{user_id}/friends"
-            friends_data = self._get_roblox_friends(friends_url)
-            
-            # Gruppi
-            groups_url = f"https://groups.roblox.com/v1/users/{user_id}/groups/roles"
-            groups_data = self._get_roblox_groups(groups_url)
-            
-            # Asset e inventario
-            assets_url = f"https://inventory.roblox.com/v1/users/{user_id}/assets/collectibles"
-            assets_data = self._get_roblox_assets(assets_url)
-            
-            return {
-                'success': True,
-                'user_id': user_id,
-                'username': username,
-                'profile_info': profile_data,
-                'online_status': presence_data,
-                'friends_count': len(friends_data) if friends_data else 0,
-                'friends_sample': friends_data[:10] if friends_data else [],
-                'groups': groups_data,
-                'assets_count': len(assets_data) if assets_data else 0,
-                'assets_sample': assets_data[:5] if assets_data else []
-            }
-            
-        except Exception as e:
-            print(f"{Colors.RED}Errore dettagli Roblox: {e}{Colors.END}")
-            return {'success': False, 'error': str(e)}
-
-    def _get_roblox_presence(self, user_ids):
-        """Ottiene lo stato online"""
-        try:
-            response = self.session.post(
-                "https://presence.roblox.com/v1/presence/users",
-                json={"userIds": user_ids}
-            )
             if response.status_code == 200:
                 return response.json()
-        except:
-            pass
-        return {"userPresences": [{"userPresenceType": 0, "lastLocation": "Unknown"}]}
-
-    def _get_roblox_friends(self, friends_url):
-        """Ottiene lista amici"""
-        try:
-            response = self.session.get(friends_url)
-            if response.status_code == 200:
-                return response.json().get('data', [])
-        except:
-            pass
-        return []
-
-    def _get_roblox_groups(self, groups_url):
-        """Ottieni gruppi dell'utente"""
-        try:
-            response = self.session.get(groups_url)
-            if response.status_code == 200:
-                groups = response.json().get('data', [])
-                return [{
-                    'name': group.get('group', {}).get('name'),
-                    'role': group.get('role', {}).get('name')
-                } for group in groups[:5]]
-        except:
-            pass
-        return []
-
-    def _get_roblox_assets(self, assets_url):
-        """Ottieni asset dell'utente"""
-        try:
-            response = self.session.get(assets_url)
-            if response.status_code == 200:
-                return response.json().get('data', [])
-        except:
-            pass
-        return []
-
-    def _fallback_roblox_search(self, username):
-        """Metodo fallback per ricerca Roblox"""
-        try:
-            # Ricerca tramite sito web
-            search_url = f"https://www.roblox.com/search/users?keyword={username}"
-            response = self.session.get(search_url)
-            
-            if response.status_code == 200:
-                # Estrazione pattern dal HTML
-                patterns = [
-                    r'data-userid="(\d+)"',
-                    r'displayName":"([^"]+)"',
-                    r'username":"([^"]+)"'
-                ]
-                
-                for pattern in patterns:
-                    matches = re.findall(pattern, response.text)
-                    if matches:
-                        return {
-                            'success': True,
-                            'username': username,
-                            'found_in_html': True,
-                            'matches': matches[:3]
-                        }
-        
+            return None
         except Exception as e:
-            print(f"{Colors.RED}Errore ricerca Roblox: {e}{Colors.END}")
-        
-        return {'success': False, 'error': 'User not found'}
+            print(f"{Colors.RED}Error getting user info: {e}{Colors.END}")
+            return None
 
-    def roblox_get_game_server(self, username):
-        """Cerca di identificare il server di gioco dell'utente"""
-        print(f"\n{Colors.CYAN}[🎯] Ricerca server di gioco per: {username}{Colors.END}")
-        
+    def get_roblox_friends(self, user_id):
+        """Get user's friends list"""
         try:
-            # Questo è più complesso e richiederebbe accesso speciale
-            # Simuliamo una ricerca attraverso vari metodi
-            
-            methods = [
-                self._check_roblox_public_servers,
-                self._search_game_telemetry,
-                self._check_recent_activities
-            ]
-            
-            for method in methods:
-                result = method(username)
-                if result and result.get('found'):
-                    return result
-            
-            return {
-                'found': False,
-                'message': 'Impossibile determinare il server corrente',
-                'suggestions': [
-                    'Il giocatore potrebbe essere offline',
-                    'I server sono privati',
-                    'Limitazioni API Roblox'
-                ]
-            }
-            
-        except Exception as e:
-            return {'found': False, 'error': str(e)}
-
-    def _check_roblox_public_servers(self, username):
-        """Controlla server pubblici"""
-        return {
-            'found': False,
-            'method': 'public_servers',
-            'message': 'I server pubblici non sono accessibili via API'
-        }
-
-    def _search_game_telemetry(self, username):
-        """Cerca nei dati di telemetria"""
-        return {
-            'found': False, 
-            'method': 'telemetry',
-            'message': 'Dati di telemetria non disponibili pubblicamente'
-        }
-
-    def _check_recent_activities(self, username):
-        """Controlla attività recenti"""
-        return {
-            'found': False,
-            'method': 'recent_activities', 
-            'message': 'Attività recenti non accessibili via API pubblica'
-        }
-
-    # ==================== INSTAGRAM REAL METHODS ====================
-
-    def instagram_get_public_data(self, username):
-        """Ottiene dati REALI da Instagram"""
-        print(f"\n{Colors.CYAN}[📷] Ricerca informazioni REALI Instagram per: {username}{Colors.END}")
-        
-        try:
-            # Metodo 1: Instagram Public API (limitata)
-            public_data = self._instagram_public_api(username)
-            
-            # Metodo 2: Web scraping (rispettando robots.txt)
-            scraped_data = self._instagram_web_scraping(username)
-            
-            # Metodo 3: Ricerca attraverso servizi terzi
-            third_party_data = self._instagram_third_party(username)
-            
-            return {
-                'success': True,
-                'username': username,
-                'public_api': public_data,
-                'web_data': scraped_data,
-                'third_party': third_party_data,
-                'combined_analysis': self._analyze_combined_data(public_data, scraped_data, third_party_data)
-            }
-            
-        except Exception as e:
-            print(f"{Colors.RED}Errore Instagram: {e}{Colors.END}")
-            return {'success': False, 'error': str(e)}
-
-    def _instagram_public_api(self, username):
-        """Utilizza Instagram Public API"""
-        try:
-            # URL pubblica di Instagram per i profili
-            profile_url = f"https://www.instagram.com/{username}/?__a=1"
-            response = self.session.get(profile_url)
+            url = f"https://friends.roblox.com/v1/users/{user_id}/friends"
+            response = self.session.get(url)
             
             if response.status_code == 200:
                 data = response.json()
-                user_data = data.get('graphql', {}).get('user', {})
-                
-                return {
-                    'full_name': user_data.get('full_name'),
-                    'biography': user_data.get('biography'),
-                    'followers': user_data.get('edge_followed_by', {}).get('count'),
-                    'following': user_data.get('edge_follow', {}).get('count'),
-                    'posts_count': user_data.get('edge_owner_to_timeline_media', {}).get('count'),
-                    'is_private': user_data.get('is_private'),
-                    'is_verified': user_data.get('is_verified'),
-                    'profile_pic_url': user_data.get('profile_pic_url_hd')
-                }
-        
+                return data.get('data', [])
+            return []
         except Exception as e:
-            print(f"{Colors.YELLOW}API Instagram limitata: {e}{Colors.END}")
-        
-        return {'error': 'Dati non disponibili via API pubblica'}
+            print(f"{Colors.RED}Error getting friends: {e}{Colors.END}")
+            return []
 
-    def _instagram_web_scraping(self, username):
-        """Web scraping rispettoso di Instagram"""
+    def get_roblox_groups(self, user_id):
+        """Get user's groups"""
         try:
+            url = f"https://groups.roblox.com/v1/users/{user_id}/groups/roles"
+            response = self.session.get(url)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('data', [])
+            return []
+        except Exception as e:
+            print(f"{Colors.RED}Error getting groups: {e}{Colors.END}")
+            return []
+
+    def get_roblox_assets(self, user_id):
+        """Get user's owned assets"""
+        try:
+            url = f"https://inventory.roblox.com/v1/users/{user_id}/assets/collectibles?limit=10"
+            response = self.session.get(url)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('data', [])
+            return []
+        except Exception as e:
+            print(f"{Colors.RED}Error getting assets: {e}{Colors.END}")
+            return []
+
+    def get_roblox_badges(self, user_id):
+        """Get user's badges"""
+        try:
+            url = f"https://badges.roblox.com/v1/users/{user_id}/badges?limit=10"
+            response = self.session.get(url)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('data', [])
+            return []
+        except Exception as e:
+            print(f"{Colors.RED}Error getting badges: {e}{Colors.END}")
+            return []
+
+    def roblox_osint(self, username):
+        """COMPLETE Roblox OSINT - WORKING"""
+        print(f"\n{Colors.CYAN}[🎮] STARTING ROBLOX ANALYSIS FOR: {username}{Colors.END}")
+        
+        # Get user ID
+        user_id = self.get_roblox_user_id(username)
+        if not user_id:
+            print(f"{Colors.RED}❌ Roblox user not found: {username}{Colors.END}")
+            return None
+        
+        print(f"{Colors.GREEN}✅ User ID found: {user_id}{Colors.END}")
+        
+        # Collect all data
+        user_info = self.get_roblox_user_info(user_id)
+        friends = self.get_roblox_friends(user_id)
+        groups = self.get_roblox_groups(user_id)
+        assets = self.get_roblox_assets(user_id)
+        badges = self.get_roblox_badges(user_id)
+        
+        # Compile results
+        results = {
+            'success': True,
+            'user_id': user_id,
+            'username': username,
+            'user_info': user_info,
+            'friends_count': len(friends),
+            'friends_sample': friends[:5],
+            'groups_count': len(groups),
+            'groups_sample': groups[:5],
+            'assets_count': len(assets),
+            'assets_sample': assets[:3],
+            'badges_count': len(badges),
+            'badges_sample': badges[:3]
+        }
+        
+        return results
+
+    def display_roblox_results(self, results):
+        """Display Roblox results in readable format"""
+        if not results or not results.get('success'):
+            print(f"{Colors.RED}❌ No data found{Colors.END}")
+            return
+        
+        user_info = results.get('user_info', {})
+        
+        print(f"\n{Colors.GREEN}{Colors.BOLD}🎮 ROBLOX RESULTS - REAL DATA{Colors.END}")
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
+        
+        # Basic info
+        print(f"{Colors.BOLD}👤 PROFILE INFORMATION:{Colors.END}")
+        print(f"  Display Name: {user_info.get('displayName', 'N/A')}")
+        print(f"  Username: {results.get('username')}")
+        print(f"  User ID: {results.get('user_id')}")
+        print(f"  Description: {user_info.get('description', 'No description')}")
+        print(f"  Account Created: {user_info.get('created', 'N/A')}")
+        print(f"  Verified: {'✅' if user_info.get('isVerified', False) else '❌'}")
+        
+        # Statistics
+        print(f"\n{Colors.BOLD}📊 STATISTICS:{Colors.END}")
+        print(f"  Friends Count: {results.get('friends_count', 0)}")
+        print(f"  Groups Count: {results.get('groups_count', 0)}")
+        print(f"  Assets Owned: {results.get('assets_count', 0)}")
+        print(f"  Badges Earned: {results.get('badges_count', 0)}")
+        
+        # Friends sample
+        if results.get('friends_sample'):
+            print(f"\n{Colors.BOLD}👥 FRIENDS (FIRST 5):{Colors.END}")
+            for friend in results['friends_sample']:
+                print(f"  • {friend.get('name', 'N/A')} (ID: {friend.get('id')})")
+        
+        # Groups sample
+        if results.get('groups_sample'):
+            print(f"\n{Colors.BOLD}👥 GROUPS (FIRST 5):{Colors.END}")
+            for group in results['groups_sample']:
+                group_info = group.get('group', {})
+                role = group.get('role', {})
+                print(f"  • {group_info.get('name', 'N/A')} - {role.get('name', 'Member')}")
+        
+        # Assets sample
+        if results.get('assets_sample'):
+            print(f"\n{Colors.BOLD}💎 ASSETS (FIRST 3):{Colors.END}")
+            for asset in results['assets_sample']:
+                print(f"  • {asset.get('name', 'N/A')}")
+        
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
+
+    # ==================== INSTAGRAM REAL OSINT ====================
+
+    def instagram_osint(self, username):
+        """Instagram OSINT using real methods"""
+        print(f"\n{Colors.CYAN}[📷] STARTING INSTAGRAM ANALYSIS FOR: {username}{Colors.END}")
+        
+        try:
+            # Try to get public data
             profile_url = f"https://www.instagram.com/{username}/"
             response = self.session.get(profile_url)
             
             if response.status_code == 200:
                 html_content = response.text
                 
-                # Estrazione dati dal HTML
+                # Extract data from HTML
                 data_patterns = {
                     'followers': r'([\d,]+)\s+followers',
-                    'following': r'([\d,]+)\s+following', 
+                    'following': r'([\d,]+)\s+following',
                     'posts': r'([\d,]+)\s+posts',
-                    'description': r'description":"([^"]+)"',
-                    'keywords': r'#(\w+)'
+                    'description': r'"description":"([^"]+)"',
+                    'is_private': r'"is_private":(true|false)',
+                    'full_name': r'"full_name":"([^"]+)"'
                 }
                 
-                extracted_data = {}
+                extracted_data = {'success': True, 'username': username}
                 for key, pattern in data_patterns.items():
                     matches = re.findall(pattern, html_content)
                     if matches:
-                        extracted_data[key] = matches[0] if key != 'keywords' else matches
+                        extracted_data[key] = matches[0]
                 
                 return extracted_data
+            else:
+                return {'success': False, 'error': 'Profile not accessible'}
                 
         except Exception as e:
-            print(f"{Colors.YELLOW}Scraping limitato: {e}{Colors.END}")
-        
-        return {'error': 'Scraping non riuscito'}
+            return {'success': False, 'error': str(e)}
 
-    def _instagram_third_party(self, username):
-        """Ricerca attraverso servizi terzi (legali)"""
-        try:
-            # Servizi di analisi pubblici
-            services = [
-                f"https://www.picuki.com/profile/{username}",
-                f"https://imginn.com/{username}/"
-            ]
-            
-            third_party_results = {}
-            for service in services:
-                try:
-                    response = self.session.get(service, timeout=5)
-                    if response.status_code == 200:
-                        third_party_results[service] = 'Available'
-                    else:
-                        third_party_results[service] = 'Not available'
-                except:
-                    third_party_results[service] = 'Error'
-            
-            return third_party_results
-            
-        except Exception as e:
-            return {'error': str(e)}
-
-    def _analyze_combined_data(self, api_data, web_data, third_party):
-        """Analizza i dati combinati"""
-        analysis = {
-            'profile_exists': bool(api_data and 'error' not in api_data),
-            'data_sources_available': [],
-            'estimated_engagement': 'Unknown',
-            'content_type_analysis': 'Not enough data',
-            'recommendations': []
-        }
+    def display_instagram_results(self, results):
+        """Display Instagram results"""
+        if not results or not results.get('success'):
+            print(f"{Colors.RED}❌ Cannot retrieve Instagram data{Colors.END}")
+            return
         
-        if api_data and 'error' not in api_data:
-            analysis['data_sources_available'].append('Instagram Public API')
-            
-        if web_data and 'error' not in web_data:
-            analysis['data_sources_available'].append('Web Scraping')
-            
-        if third_party and 'error' not in third_party:
-            analysis['data_sources_available'].append('Third Party Services')
+        print(f"\n{Colors.GREEN}{Colors.BOLD}📷 INSTAGRAM RESULTS{Colors.END}")
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
         
-        return analysis
+        if results.get('full_name'):
+            print(f"{Colors.BOLD}👤 PROFILE INFORMATION:{Colors.END}")
+            print(f"  Full Name: {results.get('full_name')}")
+            print(f"  Username: {results.get('username')}")
+            print(f"  Bio: {results.get('description', 'No bio')}")
+            print(f"  Followers: {results.get('followers', 'N/A')}")
+            print(f"  Following: {results.get('following', 'N/A')}")
+            print(f"  Posts: {results.get('posts', 'N/A')}")
+            print(f"  Private: {'✅' if results.get('is_private') == 'true' else '❌'}")
+        else:
+            # Fallback display
+            print(f"{Colors.BOLD}👤 BASIC INFORMATION:{Colors.END}")
+            print(f"  Username: {results.get('username')}")
+            for key, value in results.items():
+                if key not in ['success', 'username', 'error']:
+                    print(f"  {key.replace('_', ' ').title()}: {value}")
+        
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
 
     # ==================== UNIVERSAL SEARCH ====================
 
     def universal_search(self, username):
-        """Ricerca universale attraverso multiple piattaforme"""
-        print(f"\n{Colors.CYAN}[🌐] RICERCA UNIVERSALE per: {username}{Colors.END}")
+        """Search across multiple platforms"""
+        print(f"\n{Colors.CYAN}[🌐] STARTING UNIVERSAL SEARCH FOR: {username}{Colors.END}")
         
         platforms = {
             'GitHub': f'https://api.github.com/users/{username}',
-            'Twitter': f'https://twitter.com/{username}',
             'Reddit': f'https://www.reddit.com/user/{username}/about.json',
-            'Steam': f'https://steamcommunity.com/id/{username}?xml=1'
+            'Twitter': f'https://twitter.com/{username}',
+            'Steam': f'https://steamcommunity.com/id/{username}'
         }
         
         results = {}
         
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_to_platform = {
-                executor.submit(self._check_platform, platform, url): platform 
-                for platform, url in platforms.items()
-            }
-            
-            for future in concurrent.futures.as_completed(future_to_platform):
-                platform = future_to_platform[future]
-                try:
-                    results[platform] = future.result()
-                except Exception as e:
-                    results[platform] = {'error': str(e)}
+        for platform, url in platforms.items():
+            try:
+                response = self.session.get(url, timeout=10)
+                
+                if response.status_code == 200:
+                    results[platform] = {
+                        'exists': True,
+                        'url': url,
+                        'status': 'Found'
+                    }
+                elif response.status_code == 404:
+                    results[platform] = {
+                        'exists': False,
+                        'url': url,
+                        'status': 'Not found'
+                    }
+                else:
+                    results[platform] = {
+                        'exists': 'Unknown',
+                        'url': url,
+                        'status_code': response.status_code
+                    }
+                    
+            except Exception as e:
+                results[platform] = {
+                    'exists': 'Error',
+                    'url': url,
+                    'error': str(e)
+                }
         
         return results
 
-    def _check_platform(self, platform, url):
-        """Controlla presenza su una piattaforma"""
-        try:
-            response = self.session.get(url, timeout=10)
-            
-            if response.status_code == 200:
-                return {
-                    'exists': True,
-                    'url': url,
-                    'data_available': True
-                }
-            elif response.status_code == 404:
-                return {
-                    'exists': False,
-                    'url': url
-                }
-            else:
-                return {
-                    'exists': 'Unknown',
-                    'status_code': response.status_code,
-                    'url': url
-                }
-                
-        except Exception as e:
-            return {
-                'exists': 'Error',
-                'error': str(e),
-                'url': url
-            }
-
-    # ==================== DISPLAY RESULTS ====================
-
-    def display_roblox_results(self, results):
-        """Mostra risultati Roblox"""
-        print(f"\n{Colors.GREEN}{Colors.BOLD}🎮 RISULTATI ROBLOX:{Colors.END}")
-        
-        if results.get('success'):
-            profile = results.get('profile_info', {})
-            
-            print(f"{Colors.CYAN}👤 Profilo:{Colors.END}")
-            print(f"  Nome: {profile.get('displayName', 'N/A')}")
-            print(f"  Username: {results.get('username')}")
-            print(f"  ID: {results.get('user_id')}")
-            print(f"  Descrizione: {profile.get('description', 'N/A')}")
-            
-            print(f"\n{Colors.CYAN}📊 Statistiche:{Colors.END}")
-            print(f"  Amici: {results.get('friends_count', 0)}")
-            print(f"  Gruppi: {len(results.get('groups', []))}")
-            print(f"  Asset: {results.get('assets_count', 0)}")
-            
-            presence = results.get('online_status', {})
-            if presence.get('userPresences'):
-                status = "🟢 Online" if presence['userPresences'][0].get('userPresenceType') == 2 else "🔴 Offline"
-                print(f"  Stato: {status}")
-            
-            if results.get('groups'):
-                print(f"\n{Colors.CYAN}👥 Gruppi principali:{Colors.END}")
-                for group in results['groups'][:3]:
-                    print(f"  • {group.get('name')} ({group.get('role')})")
-                    
-        else:
-            print(f"{Colors.RED}❌ Nessun dato trovato per questo utente{Colors.END}")
-
-    def display_instagram_results(self, results):
-        """Mostra risultati Instagram"""
-        print(f"\n{Colors.GREEN}{Colors.BOLD}📷 RISULTATI INSTAGRAM:{Colors.END}")
-        
-        if results.get('success'):
-            api_data = results.get('public_api', {})
-            web_data = results.get('web_data', {})
-            
-            if 'error' not in api_data:
-                print(f"{Colors.CYAN}👤 Profilo Pubblico:{Colors.END}")
-                print(f"  Nome: {api_data.get('full_name', 'N/A')}")
-                print(f"  Bio: {api_data.get('biography', 'N/A')}")
-                print(f"  Followers: {api_data.get('followers', 'N/A')}")
-                print(f"  Following: {api_data.get('following', 'N/A')}")
-                print(f"  Post: {api_data.get('posts_count', 'N/A')}")
-                print(f"  Verificato: {'✅' if api_data.get('is_verified') else '❌'}")
-                print(f"  Privato: {'✅' if api_data.get('is_private') else '❌'}")
-            
-            if 'error' not in web_data:
-                print(f"\n{Colors.CYAN}🌐 Dati Web:{Colors.END}")
-                for key, value in web_data.items():
-                    if key != 'error':
-                        print(f"  {key}: {value}")
-            
-            analysis = results.get('combined_analysis', {})
-            if analysis.get('profile_exists'):
-                print(f"\n{Colors.CYAN}📈 Analisi:{Colors.END}")
-                print(f"  Fonti dati: {', '.join(analysis.get('data_sources_available', []))}")
-                
-        else:
-            print(f"{Colors.RED}❌ Impossibile recuperare dati Instagram{Colors.END}")
-
     def display_universal_results(self, results):
-        """Mostra risultati ricerca universale"""
-        print(f"\n{Colors.GREEN}{Colors.BOLD}🌐 PRESENZA ONLINE:{Colors.END}")
+        """Display universal search results"""
+        print(f"\n{Colors.GREEN}{Colors.Bold}🌐 ONLINE PRESENCE RESULTS{Colors.END}")
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
         
         for platform, data in results.items():
             if data.get('exists') is True:
-                print(f"  {Colors.GREEN}✅ {platform}: TROVATO{Colors.END}")
+                print(f"  {Colors.GREEN}✅ {platform}: FOUND{Colors.END}")
                 print(f"     URL: {data.get('url')}")
             elif data.get('exists') is False:
-                print(f"  {Colors.RED}❌ {platform}: Non trovato{Colors.END}")
+                print(f"  {Colors.RED}❌ {platform}: Not found{Colors.END}")
             else:
                 print(f"  {Colors.YELLOW}⚠️  {platform}: {data.get('exists', 'Unknown')}{Colors.END}")
+        
+        print(f"{Colors.CYAN}═" * 50 + Colors.END)
+
+    # ==================== MAIN MENU ====================
+
+    def main_menu(self):
+        """Display main menu"""
+        print(f"\n{Colors.BOLD}{Colors.CYAN}=== MAIN MENU ==={Colors.END}")
+        print(f"{Colors.GREEN}[1]{Colors.END} Roblox OSINT (Real API)")
+        print(f"{Colors.GREEN}[2]{Colors.END} Instagram OSINT (Web Scraping)")
+        print(f"{Colors.GREEN}[3]{Colors.END} Universal Platform Search")
+        print(f"{Colors.GREEN}[4]{Colors.END} Quick All-in-One Search")
+        print(f"{Colors.GREEN}[0]{Colors.END} Exit")
+        
+        choice = input(f"\n{Colors.YELLOW}Select option: {Colors.END}")
+        return choice
+
+    def quick_search(self, username):
+        """Perform quick search across all platforms"""
+        print(f"\n{Colors.CYAN}[🚀] QUICK SEARCH INITIATED FOR: {username}{Colors.END}")
+        
+        results = {}
+        
+        # Roblox search
+        print(f"{Colors.YELLOW}[1/3] Searching Roblox...{Colors.END}")
+        results['Roblox'] = self.roblox_osint(username)
+        
+        # Instagram search
+        print(f"{Colors.YELLOW}[2/3] Searching Instagram...{Colors.END}")
+        results['Instagram'] = self.instagram_osint(username)
+        
+        # Universal search
+        print(f"{Colors.YELLOW}[3/3] Searching other platforms...{Colors.END}")
+        results['Universal'] = self.universal_search(username)
+        
+        return results
+
+    def display_quick_results(self, results):
+        """Display quick search results"""
+        print(f"\n{Colors.GREEN}{Colors.BOLD}🚀 QUICK SEARCH RESULTS{Colors.END}")
+        print(f"{Colors.CYAN}═" * 60 + Colors.END)
+        
+        if results.get('Roblox'):
+            self.display_roblox_results(results['Roblox'])
+        
+        if results.get('Instagram'):
+            self.display_instagram_results(results['Instagram'])
+        
+        if results.get('Universal'):
+            self.display_universal_results(results['Universal'])
 
 def main():
-    osint = RealOSINT()
+    osint = UniversalOSINT()
     osint.banner()
     
-    # Disclaimer legale
+    # Legal disclaimer
     print(f"{Colors.RED}{Colors.BOLD}")
     print("⚠️  IMPORTANT LEGAL DISCLAIMER:")
     print("⚠️  This tool is for EDUCATIONAL and SECURITY RESEARCH purposes only!")
@@ -532,50 +411,41 @@ def main():
     input(f"{Colors.YELLOW}Press Enter to continue...{Colors.END}")
     
     while True:
-        print(f"\n{Colors.CYAN}{Colors.BOLD}=== MENU PRINCIPALE ==={Colors.END}")
-        print(f"{Colors.GREEN}[1]{Colors.END} Ricerca Roblox (REALE)")
-        print(f"{Colors.GREEN}[2]{Colors.END} Ricerca Instagram (REALE)") 
-        print(f"{Colors.GREEN}[3]{Colors.END} Ricerca Universale")
-        print(f"{Colors.GREEN}[4]{Colors.END} Ricerca Server di Gioco Roblox")
-        print(f"{Colors.GREEN}[0]{Colors.END} Exit")
-        
-        choice = input(f"\n{Colors.YELLOW}Seleziona opzione: {Colors.END}")
+        choice = osint.main_menu()
         
         if choice == "1":
-            username = input(f"{Colors.YELLOW}Inserisci username Roblox: {Colors.END}")
-            results = osint.roblox_get_user_info(username)
+            username = input(f"{Colors.YELLOW}Enter Roblox username: {Colors.END}")
+            results = osint.roblox_osint(username)
             osint.display_roblox_results(results)
             
         elif choice == "2":
-            username = input(f"{Colors.YELLOW}Inserisci username Instagram: {Colors.END}")
-            results = osint.instagram_get_public_data(username)
+            username = input(f"{Colors.Yellow}Enter Instagram username: {Colors.END}")
+            results = osint.instagram_osint(username)
             osint.display_instagram_results(results)
             
         elif choice == "3":
-            username = input(f"{Colors.YELLOW}Inserisci username per ricerca universale: {Colors.END}")
+            username = input(f"{Colors.YELLOW}Enter username for universal search: {Colors.END}")
             results = osint.universal_search(username)
             osint.display_universal_results(results)
             
         elif choice == "4":
-            username = input(f"{Colors.YELLOW}Inserisci username Roblox per ricerca server: {Colors.END}")
-            results = osint.roblox_get_game_server(username)
-            print(f"\n{Colors.CYAN}Risultati ricerca server:{Colors.END}")
-            for key, value in results.items():
-                print(f"  {key}: {value}")
-                
+            username = input(f"{Colors.YELLOW}Enter username for quick search: {Colors.END}")
+            results = osint.quick_search(username)
+            osint.display_quick_results(results)
+            
         elif choice == "0":
-            print(f"\n{Colors.GREEN}Grazie per aver usato Real OSINT Tool!{Colors.END}")
+            print(f"\n{Colors.GREEN}Thank you for using Universal OSINT Tool!{Colors.END}")
             break
             
         else:
-            print(f"{Colors.RED}Opzione non valida!{Colors.END}")
+            print(f"{Colors.RED}Invalid option!{Colors.END}")
         
-        input(f"\n{Colors.YELLOW}Premi Enter per continuare...{Colors.END}")
+        input(f"\n{Colors.YELLOW}Press Enter to continue...{Colors.END}")
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(f"\n{Colors.RED}Programma interrotto dall'utente.{Colors.END}")
+        print(f"\n{Colors.RED}Program interrupted by user.{Colors.END}")
     except Exception as e:
-        print(f"{Colors.RED}Errore critico: {e}{Colors.END}")
+        print(f"{Colors.RED}Critical error: {e}{Colors.END}")
