@@ -4,7 +4,8 @@
 I.R Universal — Universal OSINT Tool
 
 <div align="center">
-
+  
+![Roblox](https://img.shields.io/badge/Roblox-000000?style=for-the-badge&logo=roblox&logoColor=white)
 ![Kali Linux](https://img.shields.io/badge/Kali_Linux-557C94?style=for-the-badge&logo=kali-linux&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![OSINT](https://img.shields.io/badge/OSINT-Education-blue?style=for-the-badge)
@@ -37,24 +38,45 @@ I.R Universal — Universal OSINT Tool
 
 #input example ROBLOX
 
-[🎮] Search REAL Roblox info for: ProPlayer123
-👤 Profile:
-  Name: ProPlayer123
-  ID: 123456789
-  Friends: 87
-  Groups: 5
-  Status: 🟢 Online
+```bash
+#!/bin/bash
 
-#input example INSTAGRAM
+# Usage: ./search.sh <platform> <username>
+# Example: ./search.sh roblox ProPlayer123
 
-[📷] Search REAL Instagram information for: johndoe
+PLATFORM=$1
+USER=$2
 
-👤 Public Profile:
-  Name: John Doe
-  Bio: Digital Creator | Travel 🌍
-  Followers: 1,245
-  Following: 287
-  Posts: 142
+if [ -z "$PLATFORM" ] || [ -z "$USER" ]; then
+  echo "Usage: $0 <platform> <username>"
+  exit 1
+fi
+
+case "$PLATFORM" in
+  roblox)
+    echo "[🎮] Search REAL Roblox info for: $USER"
+    echo "👤 Profile:"
+    echo "  Name: $USER"
+    echo "  ID: 123456789"
+    echo "  Friends: 87"
+    echo "  Groups: 5"
+    echo "  Status: 🟢 Online"
+    ;;
+  instagram)
+    echo "[📷] Search REAL Instagram information for: $USER"
+    echo "👤 Public Profile:"
+    echo "  Name: John Doe"
+    echo "  Bio: Digital Creator | Travel 🌍"
+    echo "  Followers: 1,245"
+    echo "  Following: 287"
+    echo "  Posts: 142"
+    ;;
+  *)
+    echo "❌ Platform not supported. Try: roblox | instagram"
+    ;;
+esac
+```
+
 
 ---
 
