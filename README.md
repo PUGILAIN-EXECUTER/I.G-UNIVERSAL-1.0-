@@ -12,8 +12,8 @@ I.R Universal — Universal OSINT Tool
 **Advanced Open Source Intelligence Tool for Instagram & Roblox**
 
 ---
-<div aligen="center">
 *For Educational and Security Research Purposes Only*
+<div aligen="center">
   
 ![Python3](https://img.shields.io/badge/language-Python3-red)
 ![GPLv3](https://img.shields.io/badge/license-GPLv3-blue)
