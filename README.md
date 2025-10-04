@@ -19,8 +19,6 @@ I.R Universal — Universal OSINT Tool
 ![GPLv3](https://img.shields.io/badge/license-GPLv3-blue)
 ![Version-1.1](https://img.shields.io/badge/version-1.3-green)
 
-</div>
-
 ---
 **This is a demonstration of how it should look after everything has been installed.📥**
 
