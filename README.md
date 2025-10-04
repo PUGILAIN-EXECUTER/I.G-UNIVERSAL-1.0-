@@ -1,26 +1,31 @@
-# I.G-UNIVERSAL-1.0-
-🕵️ Universal OSINT Tool - Advanced Open Source Intelligence for Instagram &amp; Roblox | Kali Linux | Educational Purpose Only | Python Security Research | Public Data Analysis
-                                                                  
-I.R Universal — Universal OSINT Tool
+# I.G-UNIVERSAL-1.0
 
 <div align="center">
-  
-![Roblox](https://img.shields.io/badge/Roblox-000000?style=for-the-badge&logo=roblox&logoColor=white)
-![Kali Linux](https://img.shields.io/badge/Kali_Linux-557C94?style=for-the-badge&logo=kali-linux&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+
+# 🕵️ I.R Universal — Universal OSINT Tool
+
+![Roblox](https://img.shields.io/badge/Roblox-000000?style=for-the-badge\&logo=roblox\&logoColor=white)
+![Kali Linux](https://img.shields.io/badge/Kali_Linux-557C94?style=for-the-badge\&logo=kali-linux\&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge\&logo=python\&logoColor=white)
 ![OSINT](https://img.shields.io/badge/OSINT-Education-blue?style=for-the-badge)
+
+</div>
+
 **Advanced Open Source Intelligence Tool for Instagram & Roblox**
 
 ---
-*For Educational and Security Research Purposes Only*
-<div aligen="center">
-  
+
+<div align="center">
+
 ![Python3](https://img.shields.io/badge/language-Python3-red)
 ![GPLv3](https://img.shields.io/badge/license-GPLv3-blue)
-![Version-1.1](https://img.shields.io/badge/version-1.3-green)
+![Version-1.3](https://img.shields.io/badge/version-1.3-green)
+![Telegram](https://img.shields.io/badge/platform-Telegram-blue)
+![Docker](https://img.shields.io/badge/platform-Docker-lightgrey)
 
----
-**This is a demonstration of how it should look after everything has been installed.📥**
+</div>
+
+> *For Educational and Security Research Purposes Only*
 
 ![Avatar](https://i.postimg.cc/DZ5L0G0j/Screenshot-2025-10-03-224556.png)
 
@@ -29,7 +34,7 @@ I.R Universal — Universal OSINT Tool
 **WARNING**: This tool is developed **EXCLUSIVELY** for:
 
 * Cybersecurity education and training
-* Data-privacy research
+* Data privacy research
 * Authorized penetration testing
 * Digital security consulting
 
@@ -40,9 +45,7 @@ I.R Universal — Universal OSINT Tool
 * Any illegal activity
 * Violating platform Terms of Service
 
-**The author is not responsible for misuse of this tool. Use it ethically and lawfully.**
-
-
+**The author is not responsible for misuse of this tool. Use it ethically and legally.**
 
 ---
 
@@ -64,7 +67,7 @@ I.R Universal — Universal OSINT Tool
 
 ### 🌐 Universal Search
 
-* Multi-platform search: GitHub, Twitter/X, Reddit, public pastebins
+* Multi-platform search: GitHub, X (ex-Twitter), Reddit, public pastebins
 * Cross-platform identity correlation
 * Threaded / concurrent queries for speed
 
@@ -77,8 +80,10 @@ I.R Universal — Universal OSINT Tool
 * Linux distro (Kali Linux recommended)
 * Python 3.8+
 * pip3
+* Git
+* Docker (optional)
 
-### Quick install
+### Quick Install
 
 ```bash
 git clone https://github.com/your-username/universal-osint-tool.git
@@ -89,7 +94,19 @@ chmod +x install.sh
 
 python3 real_osint_tool.py
 ```
-**This is a demonstration of how it should look after everything has been installed.**
+
+---
+
+## 🧩 Main Files (Included in repo)
+
+* `install.sh` — installation script (creates virtualenv, installs dependencies)
+* `real_osint_tool.py` — main entrypoint (CLI / Telegram bridge)
+* `search.sh` — bash demo script to format output
+* `README.md` — this file
+
+---
+
+## 📥 Example Output (Demonstration)
 
 ```bash
 [🎮] Search REAL Roblox info for: ProPlayer123
@@ -100,7 +117,7 @@ python3 real_osint_tool.py
   Groups: 5
   Status: 🟢 Online
 
-#input example INSTAGRAM
+# input example INSTAGRAM
 
 [📷] Search REAL Instagram information for: johndoe
 
@@ -112,5 +129,71 @@ python3 real_osint_tool.py
   Posts: 142
 ```
 
+---
 
+## 🧾 Ethical Usage
 
+This project is intended for educational purposes. Before performing any public data collection, always check platform policies and obtain permissions when required.
+
+---
+
+## ⬇️ Example Scripts
+
+### `install.sh`
+
+```bash
+#!/usr/bin/env bash
+set -e
+
+# install.sh - sets up environment and dependencies
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+if [ -f requirements.txt ]; then
+  pip install -r requirements.txt
+else
+  echo "# requirements.txt not found — installing common dependencies" 
+  pip install requests beautifulsoup4 python-telegram-bot
+fi
+
+echo "Installation complete. Activate env with: source venv/bin/activate"
+```
+
+### `search.sh` (Demo)
+
+```bash
+#!/usr/bin/env bash
+
+# Usage: ./search.sh <platform> <username>
+PLATFORM="$1"
+USER="$2"
+
+if [ -z "$PLATFORM" ] || [ -z "$USER" ]; then
+  echo "Usage: $0 <platform> <username>"
+  exit 1
+fi
+
+case "${PLATFORM,,}" in
+  roblox)
+    echo "[🎮] Search REAL Roblox info for: $USER"
+    echo "👤 Profile:"
+    echo "  Name: $USER"
+    echo "  ID: 123456789"
+    echo "  Friends: 87"
+    echo "  Groups: 5"
+    echo "  Status: 🟢 Online"
+    ;;
+  instagram)
+    echo "[📷] Search REAL Instagram information for: $USER"
+    echo "👤 Public Profile:"
+    echo "  Name: John Doe"
+    echo "  Bio: Digital Creator | Travel 🌍"
+    echo "  Followers: 1,245"
+    echo "  Following: 287"
+    echo "  Posts: 142"
+    ;;
+  *)
+    echo "❌ Platform not supported. Try: roblox | instagram"
+    ;;
+esac
+```
