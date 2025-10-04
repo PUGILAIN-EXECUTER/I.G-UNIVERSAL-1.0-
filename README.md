@@ -17,6 +17,9 @@ I.R Universal — Universal OSINT Tool
 </div>
 
 ---
+**This is a demonstration of how it should look after everything has been installed.📥**
+
+![Avatar](https://i.postimg.cc/DZ5L0G0j/Screenshot-2025-10-03-224556.png)
 
 ## ⚠️ Legal Disclaimer
 
@@ -36,46 +39,6 @@ I.R Universal — Universal OSINT Tool
 
 **The author is not responsible for misuse of this tool. Use it ethically and lawfully.**
 
-#input example ROBLOX
-
-```bash
-#!/bin/bash
-
-# Usage: ./search.sh <platform> <username>
-# Example: ./search.sh roblox ProPlayer123
-
-PLATFORM=$1
-USER=$2
-
-if [ -z "$PLATFORM" ] || [ -z "$USER" ]; then
-  echo "Usage: $0 <platform> <username>"
-  exit 1
-fi
-
-case "$PLATFORM" in
-  roblox)
-    echo "[🎮] Search REAL Roblox info for: $USER"
-    echo "👤 Profile:"
-    echo "  Name: $USER"
-    echo "  ID: 123456789"
-    echo "  Friends: 87"
-    echo "  Groups: 5"
-    echo "  Status: 🟢 Online"
-    ;;
-  instagram)
-    echo "[📷] Search REAL Instagram information for: $USER"
-    echo "👤 Public Profile:"
-    echo "  Name: John Doe"
-    echo "  Bio: Digital Creator | Travel 🌍"
-    echo "  Followers: 1,245"
-    echo "  Following: 287"
-    echo "  Posts: 142"
-    ;;
-  *)
-    echo "❌ Platform not supported. Try: roblox | instagram"
-    ;;
-esac
-```
 
 
 ---
@@ -122,3 +85,29 @@ chmod +x install.sh
 ./install.sh
 
 python3 real_osint_tool.py
+```
+**This is a demonstration of how it should look after everything has been installed.**
+
+```bash
+[🎮] Search REAL Roblox info for: ProPlayer123
+👤 Profile:
+  Name: ProPlayer123
+  ID: 123456789
+  Friends: 87
+  Groups: 5
+  Status: 🟢 Online
+
+#input example INSTAGRAM
+
+[📷] Search REAL Instagram information for: johndoe
+
+👤 Public Profile:
+  Name: John Doe
+  Bio: Digital Creator | Travel 🌍
+  Followers: 1,245
+  Following: 287
+  Posts: 142
+```
+
+
+
