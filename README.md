@@ -27,7 +27,7 @@
 
 > *For Educational and Security Research Purposes Only*
 
-![Avatar](https://i.postimg.cc/DZ5L0G0j/Screenshot-2025-10-03-224556.png)
+[![Screenshot-2025-10-06-185259.png](https://i.postimg.cc/zGsQTVyZ/Screenshot-2025-10-06-185259.png)](https://postimg.cc/SnGVhQLD)
 
 ## ⚠️ Legal Disclaimer
 
