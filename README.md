@@ -11,7 +11,7 @@
 
 </div>
 
-**Advanced Open Source Intelligence Tool for Instagram & Roblox**
+**Advanced Open Source Intelligence Tool for Roblox**
 
 ---
 
